@@ -1,0 +1,13 @@
+{
+    "name": "utilazy/utilazy",
+    "description": "Smart Tools for Everyday Tasks",
+    "type": "project",
+    "require": {
+        "php": ">=8.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    }
+}

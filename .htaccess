@@ -1,0 +1,11 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^$ public/ [L]
+    RewriteRule ^((?!public/).*)$ public/$1 [L]
+</IfModule>
+
+# Protect sensitive files
+<FilesMatch "^\\.env|schema\\.sql|seed\\.sql">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
