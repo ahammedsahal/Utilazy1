@@ -56,7 +56,7 @@ $pageTitle = htmlspecialchars($tool['name']) . " — Utilazy";
             </div>
         </div>
         <div class="col-span-1 space-y-6">
-            <?php if (Session::check()): ?>
+            <?php if (\App\Helpers\Session::check()): ?>
                 <div class="bg-[var(--color-surface)] border border-[var(--color-border)] p-5 rounded-[20px] shadow-sm">
                     <h4 class="text-xs font-bold text-[var(--color-ink-400)] uppercase tracking-wider mb-2">My Account Status</h4>
                     <div class="flex items-center justify-between">

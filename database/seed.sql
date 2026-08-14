@@ -127,4 +127,4 @@ INSERT INTO `site_settings` (`key`, `value`, `type`) VALUES
 -- 6. Insert Default Admin User
 -- Password is 'admin123'
 INSERT INTO `users` (`id`, `name`, `email`, `password_hash`, `email_verified_at`, `unlimited_tokens`, `status`) VALUES
-(1, 'Super Admin', 'admin@utilazy.com', '$2y$10$gP77V8P8Xp64e7HWe81T1OSDqL2f8sN2f9f8G6Fp/Zt6v7v7u8u8u', CURRENT_TIMESTAMP, 1, 'active');
+(1, 'Super Admin', 'admin@utilazy.com', '$2y$10$22yXf6UIsB5R20Wst.iVfeYy0X6pA6uThO3eCThA/gBOnwLly2e2q', CURRENT_TIMESTAMP, 1, 'active');
