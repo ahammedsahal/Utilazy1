@@ -4,7 +4,9 @@ $pageTitle = htmlspecialchars($tool['name']) . " — Utilazy";
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 my-8">
     <div class="bg-[var(--color-surface)] border border-[var(--color-border)] p-6 rounded-[20px] mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm">
         <div class="flex items-center gap-4">
-            <span class="text-4xl p-3 bg-[var(--color-surface-alt)] rounded-2xl border border-[var(--color-border)]"><?= $tool['icon'] ?></span>
+            <span class="text-4xl p-3 bg-[var(--color-surface-alt)] rounded-2xl border border-[var(--color-border)] text-[var(--color-ember-500)] flex items-center justify-center">
+                <?= \App\Helpers\Icon::render($tool['icon']) ?>
+            </span>
             <div>
                 <span class="text-xs font-bold text-[var(--color-ember-500)] uppercase tracking-widest block mb-0.5"><?= htmlspecialchars($category['name']) ?></span>
                 <h1 class="text-2xl font-black text-[var(--color-ink-900)] leading-tight"><?= htmlspecialchars($tool['name']) ?></h1>
@@ -78,7 +80,9 @@ $pageTitle = htmlspecialchars($tool['name']) . " — Utilazy";
                 <div class="space-y-3">
                     <?php foreach ($related as $rel): ?>
                         <a href="/tools/<?= $rel['slug'] ?>" class="flex items-center gap-3 p-2 bg-[var(--color-surface-alt)] hover:bg-[var(--color-border)] rounded-xl transition border border-[var(--color-border)] group">
-                            <span class="text-2xl group-hover:scale-110 transition-transform"><?= $rel['icon'] ?></span>
+                            <span class="text-xl text-[var(--color-ember-500)] group-hover:scale-110 transition-transform flex items-center justify-center p-1.5 bg-[var(--color-surface)] rounded-lg">
+                                <?= \App\Helpers\Icon::render($rel['icon']) ?>
+                            </span>
                             <div>
                                 <span class="text-xs font-bold text-[var(--color-ink-900)] block line-clamp-1"><?= htmlspecialchars($rel['name']) ?></span>
                                 <span class="text-[10px] text-[var(--color-ink-600)] block line-clamp-1"><?= htmlspecialchars($rel['description']) ?></span>

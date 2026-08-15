@@ -1,4 +1,6 @@
 <?php
+use App\Helpers\Session;
+
 $pageTitle = "Pricing Plans & Token Packages — Utilazy";
 ?>
 
