@@ -31,8 +31,6 @@ class DB {
                 PDO::ATTR_EMULATE_PREPARES   => false,
             ]);
 
-            self::autoRepairSuperAdmin(self::$pdo);
-
             return self::$pdo;
         } catch (PDOException $e) {
             if (Env::get('APP_ENV') === 'development') {
@@ -43,28 +41,6 @@ class DB {
         }
     }
 
-    protected static function autoRepairSuperAdmin(PDO $pdo) {
-        try {
-            $stmt = $pdo->prepare("SELECT id, password_hash FROM users WHERE email = ?");
-            $stmt->execute(['admin@utilazy.com']);
-            $admin = $stmt->fetch();
-
-            $adminPass = 'admin123';
-            if (!$admin) {
-                $hash = password_hash($adminPass, PASSWORD_BCRYPT);
-                $ins = $pdo->prepare("INSERT INTO users (name, email, password_hash, email_verified_at, unlimited_tokens, status) VALUES (?, ?, ?, NOW(), 1, 'active')");
-                $ins->execute(['Super Admin', 'admin@utilazy.com', $hash]);
-            } else {
-                if (!password_verify($adminPass, $admin['password_hash'])) {
-                    $hash = password_hash($adminPass, PASSWORD_BCRYPT);
-                    $upd = $pdo->prepare("UPDATE users SET password_hash = ?, unlimited_tokens = 1, status = 'active' WHERE id = ?");
-                    $upd->execute([$hash, $admin['id']]);
-                }
-            }
-        } catch (Exception $e) {
-            // Silence if table not initialized yet
-        }
-    }
 
     public static function query($sql, $params = []) {
         $pdo = self::connect();

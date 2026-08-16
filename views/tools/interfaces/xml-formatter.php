@@ -32,12 +32,46 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (processBtn) {
         processBtn.addEventListener("click", () => {
-            const val = input.value;
+            const val = input.value.trim();
             if (!val) {
-                output.value = "Status: Operational. Ready for processing input data.";
+                output.value = "Please enter valid XML markup to format.";
                 return;
             }
-            output.value = "Output processed successfully for: " + val.substring(0, 100);
+            try {
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(val, "text/xml");
+                const errorNode = xmlDoc.querySelector("parsererror");
+                if (errorNode) {
+                    output.value = "XML Parsing Error: " + errorNode.textContent;
+                    return;
+                }
+                function formatXml(xml) {
+                    let formatted = '';
+                    const reg = /(>)(<)(\/*)/g;
+                    xml = xml.replace(reg, '$1\r\n$2$3');
+                    let pad = 0;
+                    xml.split('\r\n').forEach(node => {
+                        let indent = 0;
+                        if (node.match(/.+<\/\w[^>]*>$/)) {
+                            indent = 0;
+                        } else if (node.match(/^<\/\w/)) {
+                            if (pad !== 0) pad -= 1;
+                        } else if (node.match(/^<\w[^>]*[^\/]>.*$/)) {
+                            indent = 1;
+                        } else {
+                            indent = 0;
+                        }
+                        let padding = '';
+                        for (let i = 0; i < pad; i++) padding += '  ';
+                        formatted += padding + node + '\r\n';
+                        pad += indent;
+                    });
+                    return formatted.trim();
+                }
+                output.value = formatXml(val);
+            } catch (err) {
+                output.value = "Error processing XML: " + err.message;
+            }
         });
     }
 

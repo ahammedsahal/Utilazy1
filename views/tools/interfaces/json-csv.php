@@ -32,12 +32,35 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (processBtn) {
         processBtn.addEventListener("click", () => {
-            const val = input.value;
+            const val = input.value.trim();
             if (!val) {
-                output.value = "Status: Operational. Ready for processing input data.";
+                output.value = "Please enter valid JSON data (an array of objects).";
                 return;
             }
-            output.value = "Output processed successfully for: " + val.substring(0, 100);
+            try {
+                let parsed = JSON.parse(val);
+                if (!Array.isArray(parsed)) {
+                    if (typeof parsed === "object" && parsed !== null) {
+                        parsed = [parsed];
+                    } else {
+                        output.value = "JSON must be an array of objects.";
+                        return;
+                    }
+                }
+                const headers = Array.from(new Set(parsed.flatMap(obj => Object.keys(obj))));
+                const csvRows = [headers.join(",")];
+                parsed.forEach(row => {
+                    const values = headers.map(header => {
+                        const val = row[header] !== undefined ? row[header] : "";
+                        const str = typeof val === "object" ? JSON.stringify(val) : String(val);
+                        return `"${str.replace(/"/g, '""')}"`;
+                    });
+                    csvRows.push(values.join(","));
+                });
+                output.value = csvRows.join("\n");
+            } catch (err) {
+                output.value = "JSON Error: " + err.message;
+            }
         });
     }
 

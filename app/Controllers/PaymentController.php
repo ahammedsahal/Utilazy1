@@ -101,6 +101,12 @@ class PaymentController {
     }
     public function simulateCheckout() {
         if (!Session::check()) return Response::json(['error' => 'Login required.'], 401);
+        Env::load(dirname(__DIR__, 2) . '/.env');
+        $appEnv = Env::get('APP_ENV', 'production');
+        $isAdmin = Session::get('user_role') === 'admin' || (Session::user()['email'] ?? '') === 'admin@utilazy.com';
+        if ($appEnv !== 'development' && !$isAdmin) {
+            return Response::json(['error' => 'Checkout simulation is disabled in production.'], 403);
+        }
         $userId = Session::userId();
         $packageId = (int)($_POST['package_id'] ?? 0);
         $couponCode = trim($_POST['coupon_code'] ?? '');

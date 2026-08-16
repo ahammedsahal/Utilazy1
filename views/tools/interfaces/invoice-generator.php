@@ -106,3 +106,31 @@ document.addEventListener("DOMContentLoaded", () => {
     printBtn.addEventListener("click", () => window.print());
 });
 </script>
+
+<style>
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    #invoice-builder, #invoice-builder * {
+        visibility: visible;
+    }
+    #invoice-builder {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        padding: 20px;
+        background: #ffffff !important;
+        color: #14120f !important;
+    }
+    #inv-add-item, #inv-print {
+        display: none !important;
+    }
+    input, textarea {
+        border: none !important;
+        background: transparent !important;
+        resize: none !important;
+    }
+}
+</style>

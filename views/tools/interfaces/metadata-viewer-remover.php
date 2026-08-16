@@ -1,58 +1,78 @@
 <div class="space-y-6" id="app-metadata-viewer-remover">
     <div class="bg-[var(--color-surface-alt)] p-6 rounded-2xl border border-[var(--color-border)] space-y-4">
         <h3 class="text-base font-bold text-[var(--color-ink-900)] flex items-center gap-2">
-            <span>🛠️</span> Metadata Viewer Remover Studio
+            <span>🏷️</span> Image Metadata Viewer & EXIF Remover
         </h3>
-        <p class="text-xs text-[var(--color-ink-600)]">Configure parameters or input payload to process client-side instantly.</p>
+        <p class="text-xs text-[var(--color-ink-600)]">Inspect image details and strip EXIF metadata for privacy.</p>
 
-        <textarea id="input-metadata-viewer-remover" class="w-full h-36 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-3 text-xs font-mono focus:outline-none focus:border-[var(--color-ember-500)]" placeholder="Paste or type content here..."></textarea>
+        <input type="file" id="file-meta" accept="image/*" class="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-3 text-xs text-[var(--color-ink-900)] focus:outline-none">
 
         <div class="flex flex-wrap items-center gap-3">
-            <button id="btn-process-metadata-viewer-remover" class="btn-ember px-6 py-2.5 rounded-xl font-bold text-xs shadow-sm">Process Metadata Viewer Remover →</button>
-            <button id="btn-clear-metadata-viewer-remover" class="px-4 py-2.5 bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-ink-600)] rounded-xl text-xs font-semibold hover:bg-[var(--color-border)]">Clear</button>
+            <button id="btn-inspect-meta" class="btn-ember px-6 py-2.5 rounded-xl font-bold text-xs shadow-sm">Inspect Metadata →</button>
+            <button id="btn-strip-meta" class="px-6 py-2.5 bg-[var(--color-teal-500)] text-white font-bold text-xs rounded-xl shadow-sm hover:opacity-90">Strip Metadata & Clean Image →</button>
         </div>
     </div>
 
-    <div class="bg-[var(--color-surface-alt)] p-6 rounded-2xl border border-[var(--color-border)] space-y-3">
-        <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-[var(--color-ink-600)] uppercase tracking-wider">Processed Output</span>
-            <button id="btn-copy-metadata-viewer-remover" class="text-xs font-bold text-[var(--color-ember-500)] hover:underline">⧉ Copy Result</button>
+    <div id="meta-output-container" class="hidden bg-[var(--color-surface-alt)] p-6 rounded-2xl border border-[var(--color-border)] space-y-3">
+        <span class="text-xs font-bold text-[var(--color-ink-600)] uppercase tracking-wider">Metadata Info</span>
+        <textarea id="meta-info-text" readonly class="w-full h-36 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-3 text-xs font-mono text-[var(--color-teal-500)] focus:outline-none"></textarea>
+    </div>
+
+    <div id="clean-download-container" class="hidden bg-[var(--color-surface-alt)] p-6 rounded-2xl border border-[var(--color-border)] space-y-3 flex justify-between items-center">
+        <div>
+            <h4 class="text-xs font-bold text-[var(--color-ink-900)]">Cleaned Image Ready</h4>
+            <p class="text-xs text-[var(--color-ink-600)]">EXIF and camera metadata stripped completely.</p>
         </div>
-        <textarea id="output-metadata-viewer-remover" readonly class="w-full h-36 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-3 text-xs font-mono text-[var(--color-teal-500)] focus:outline-none" placeholder="Results will appear here..."></textarea>
+        <a id="btn-download-clean" download="clean-image.png" class="btn-ember px-6 py-2.5 rounded-xl font-bold text-xs shadow-sm cursor-pointer">↓ Download Clean Image</a>
     </div>
 </div>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-    const input = document.getElementById("input-metadata-viewer-remover");
-    const output = document.getElementById("output-metadata-viewer-remover");
-    const processBtn = document.getElementById("btn-process-metadata-viewer-remover");
-    const clearBtn = document.getElementById("btn-clear-metadata-viewer-remover");
-    const copyBtn = document.getElementById("btn-copy-metadata-viewer-remover");
+    const fileInput = document.getElementById("file-meta");
+    const inspectBtn = document.getElementById("btn-inspect-meta");
+    const stripBtn = document.getElementById("btn-strip-meta");
+    const metaContainer = document.getElementById("meta-output-container");
+    const metaText = document.getElementById("meta-info-text");
+    const cleanContainer = document.getElementById("clean-download-container");
+    const downloadClean = document.getElementById("btn-download-clean");
 
-    if (processBtn) {
-        processBtn.addEventListener("click", () => {
-            const val = input.value;
-            if (!val) {
-                output.value = "Status: Operational. Ready for processing input data.";
-                return;
-            }
-            output.value = "Output processed successfully for: " + val.substring(0, 100);
-        });
-    }
+    let loadedFile = null;
 
-    if (clearBtn) {
-        clearBtn.addEventListener("click", () => {
-            input.value = "";
-            output.value = "";
-        });
-    }
+    fileInput.addEventListener("change", (e) => {
+        loadedFile = e.target.files[0];
+    });
 
-    if (copyBtn) {
-        copyBtn.addEventListener("click", () => {
-            navigator.clipboard.writeText(output.value);
-            alert("Copied to clipboard!");
-        });
-    }
+    inspectBtn.addEventListener("click", () => {
+        if (!loadedFile) {
+            alert("Please select an image file first.");
+            return;
+        }
+        metaText.value = `File Name: ${loadedFile.name}\nFile Size: ${(loadedFile.size / 1024).toFixed(2)} KB\nFile Type: ${loadedFile.type}\nLast Modified: ${new Date(loadedFile.lastModified).toISOString()}`;
+        metaContainer.classList.remove("hidden");
+    });
+
+    stripBtn.addEventListener("click", () => {
+        if (!loadedFile) {
+            alert("Please select an image file first.");
+            return;
+        }
+        const img = new Image();
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+            img.onload = () => {
+                const canvas = document.createElement("canvas");
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext("2d");
+                ctx.drawImage(img, 0, 0);
+                const cleanDataUrl = canvas.toDataURL("image/png");
+                downloadClean.href = cleanDataUrl;
+                cleanContainer.classList.remove("hidden");
+            };
+            img.src = evt.target.result;
+        };
+        reader.readAsDataURL(loadedFile);
+    });
 });
 </script>

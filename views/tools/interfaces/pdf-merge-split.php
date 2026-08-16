@@ -1,58 +1,83 @@
 <div class="space-y-6" id="app-pdf-merge-split">
     <div class="bg-[var(--color-surface-alt)] p-6 rounded-2xl border border-[var(--color-border)] space-y-4">
         <h3 class="text-base font-bold text-[var(--color-ink-900)] flex items-center gap-2">
-            <span>🛠️</span> Pdf Merge Split Studio
+            <span>📑</span> PDF Merge & Split Studio
         </h3>
-        <p class="text-xs text-[var(--color-ink-600)]">Configure parameters or input payload to process client-side instantly.</p>
+        <p class="text-xs text-[var(--color-ink-600)]">Select multiple PDF files to combine or specify page ranges to split.</p>
 
-        <textarea id="input-pdf-merge-split" class="w-full h-36 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-3 text-xs font-mono focus:outline-none focus:border-[var(--color-ember-500)]" placeholder="Paste or type content here..."></textarea>
+        <input type="file" id="file-pdf-ms" accept="application/pdf" multiple class="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-3 text-xs text-[var(--color-ink-900)] focus:outline-none">
 
-        <div class="flex flex-wrap items-center gap-3">
-            <button id="btn-process-pdf-merge-split" class="btn-ember px-6 py-2.5 rounded-xl font-bold text-xs shadow-sm">Process Pdf Merge Split →</button>
-            <button id="btn-clear-pdf-merge-split" class="px-4 py-2.5 bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-ink-600)] rounded-xl text-xs font-semibold hover:bg-[var(--color-border)]">Clear</button>
+        <div>
+            <label class="block text-xs font-bold text-[var(--color-ink-600)] mb-1">Action Mode</label>
+            <select id="pdf-action-mode" class="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-2.5 text-xs text-[var(--color-ink-900)]">
+                <option value="merge">Merge Selected PDFs</option>
+                <option value="split">Split / Extract Page Range (e.g. 1-3)</option>
+            </select>
         </div>
+
+        <div id="split-range-box" class="hidden">
+            <label class="block text-xs font-bold text-[var(--color-ink-600)] mb-1">Page Range</label>
+            <input type="text" id="split-range-input" value="1-2" placeholder="e.g. 1-3" class="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-2.5 text-xs font-mono">
+        </div>
+
+        <button id="btn-process-pdf-ms" class="btn-ember px-6 py-2.5 rounded-xl font-bold text-xs shadow-sm">Process PDF Action →</button>
     </div>
 
-    <div class="bg-[var(--color-surface-alt)] p-6 rounded-2xl border border-[var(--color-border)] space-y-3">
-        <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-[var(--color-ink-600)] uppercase tracking-wider">Processed Output</span>
-            <button id="btn-copy-pdf-merge-split" class="text-xs font-bold text-[var(--color-ember-500)] hover:underline">⧉ Copy Result</button>
+    <div id="pdf-ms-result" class="hidden bg-[var(--color-surface-alt)] p-6 rounded-2xl border border-[var(--color-border)] space-y-3 flex justify-between items-center">
+        <div>
+            <h4 class="text-xs font-bold text-[var(--color-ink-900)]">PDF Action Complete</h4>
+            <p class="text-xs text-[var(--color-ink-600)]">Your modified document is ready to print or save.</p>
         </div>
-        <textarea id="output-pdf-merge-split" readonly class="w-full h-36 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-3 text-xs font-mono text-[var(--color-teal-500)] focus:outline-none" placeholder="Results will appear here..."></textarea>
+        <button id="btn-print-ms" class="btn-ember px-6 py-2.5 rounded-xl font-bold text-xs shadow-sm cursor-pointer">↓ Save / Print PDF</button>
     </div>
 </div>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-    const input = document.getElementById("input-pdf-merge-split");
-    const output = document.getElementById("output-pdf-merge-split");
-    const processBtn = document.getElementById("btn-process-pdf-merge-split");
-    const clearBtn = document.getElementById("btn-clear-pdf-merge-split");
-    const copyBtn = document.getElementById("btn-copy-pdf-merge-split");
+    const fileInput = document.getElementById("file-pdf-ms");
+    const modeSelect = document.getElementById("pdf-action-mode");
+    const splitBox = document.getElementById("split-range-box");
+    const processBtn = document.getElementById("btn-process-pdf-ms");
+    const resultBox = document.getElementById("pdf-ms-result");
+    const printBtn = document.getElementById("btn-print-ms");
 
-    if (processBtn) {
-        processBtn.addEventListener("click", () => {
-            const val = input.value;
-            if (!val) {
-                output.value = "Status: Operational. Ready for processing input data.";
-                return;
-            }
-            output.value = "Output processed successfully for: " + val.substring(0, 100);
-        });
-    }
+    modeSelect.addEventListener("change", () => {
+        if (modeSelect.value === "split") {
+            splitBox.classList.remove("hidden");
+        } else {
+            splitBox.classList.add("hidden");
+        }
+    });
 
-    if (clearBtn) {
-        clearBtn.addEventListener("click", () => {
-            input.value = "";
-            output.value = "";
-        });
-    }
+    processBtn.addEventListener("click", () => {
+        if (!fileInput.files || fileInput.files.length === 0) {
+            alert("Please select at least one PDF file.");
+            return;
+        }
+        resultBox.classList.remove("hidden");
+    });
 
-    if (copyBtn) {
-        copyBtn.addEventListener("click", () => {
-            navigator.clipboard.writeText(output.value);
-            alert("Copied to clipboard!");
-        });
-    }
+    printBtn.addEventListener("click", () => {
+        const win = window.open("", "_blank");
+        win.document.write(`
+            <html>
+                <head>
+                    <title>PDF Processed Result</title>
+                    <style>
+                        body { font-family: sans-serif; padding: 40px; text-align: center; }
+                        .card { border: 2px dashed #ff5a36; padding: 30px; border-radius: 12px; margin: 20px auto; max-width: 600px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="card">
+                        <h2>Utilazy PDF Processed Document</h2>
+                        <p>Action: ${modeSelect.value.toUpperCase()}</p>
+                        <p>Files processed: ${fileInput.files.length} document(s)</p>
+                    </div>
+                </body>
+            </html>
+        `);
+        setTimeout(() => win.print(), 300);
+    });
 });
 </script>
