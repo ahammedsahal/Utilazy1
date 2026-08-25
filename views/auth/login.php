@@ -5,8 +5,8 @@ $settingsMap = [];
 foreach ($settings as $s) {
     $settingsMap[$s['key']] = $s['value'];
 }
-$turnstileEnabled = ($settingsMap['turnstile_enabled'] ?? '1') === '1';
-$turnstileSiteKey = $settingsMap['turnstile_site_key'] ?? '1x00000000000000000000AA';
+$turnstileEnabled = (($settingsMap['turnstile_enabled'] ?? '0') === '1') && (!empty($settingsMap['turnstile_site_key']) && $settingsMap['turnstile_site_key'] !== '1x00000000000000000000AA');
+$turnstileSiteKey = $settingsMap['turnstile_site_key'] ?? '';
 ?>
 
 <div class="max-w-md mx-auto my-12 px-6 py-8 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[20px] shadow-sm">
